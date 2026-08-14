@@ -1,0 +1,19 @@
+.brand-lockup {
+  background: rgba(255, 255, 255, .95);
+  border-color: rgba(185, 133, 120, .28);
+  color: var(--navy);
+  box-shadow: 0 10px 30px rgba(2, 17, 31, .12);
+}
+
+.brand-mark {
+  background: #fff;
+  border-color: rgba(185, 133, 120, .20);
+}
+
+.brand-copy strong {
+  color: var(--navy);
+}
+
+.brand-copy span {
+  color: var(--roseDark);
+}
