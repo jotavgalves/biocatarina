@@ -69,7 +69,7 @@ window.BIO_CONFIG = {
 
   links: [
     {
-      visible: true,
+      visible: false,
       icon: "whatsapp",
       label: "Agendar pelo WhatsApp",
       detail: "Atendimento com hora marcada",
