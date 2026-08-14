@@ -90,11 +90,11 @@ window.BIO_CONFIG = {
       url: "https://www.google.com/maps/search/?api=1&query=R.%20Ribeiro%20de%20Brito%2C%20554%20Boa%20Viagem%20Recife%20PE"
     },
     {
-      visible: false,
+      visible: true,
       icon: "globe",
-      label: "Site Completo",
-      detail: "Conheça tratamentos e a clínica",
-      url: ""
+      label: "Site Oficial",
+      detail: "Conheça a Catarina Queiroz Clínica Estética",
+      url: "https://catarinaqueiroz.com.br/"
     }
   ],
 
