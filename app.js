@@ -1,12 +1,13 @@
 (() => {
   "use strict";
 
-  const config = window.BIO_CONFIG;
-  if (!config) {
+  const fallbackConfig = window.BIO_CONFIG;
+  if (!fallbackConfig) {
     console.error("BIO_CONFIG não encontrado.");
     return;
   }
 
+  let config = fallbackConfig;
   const root = document.documentElement;
   const $ = (selector) => document.querySelector(selector);
 
@@ -18,6 +19,38 @@
     globe: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 3.8 5.5 3.8 9S14.5 18.5 12 21M12 3C9.5 5.5 8.2 8.5 8.2 12S9.5 18.5 12 21"/></svg>'
   };
 
+  function escapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function merge(base, incoming) {
+    if (Array.isArray(incoming)) return incoming;
+    if (!incoming || typeof incoming !== "object") return incoming;
+    const output = { ...(base && typeof base === "object" ? base : {}) };
+    Object.entries(incoming).forEach(([key, value]) => {
+      output[key] = value && typeof value === "object" && !Array.isArray(value)
+        ? merge(output[key], value)
+        : value;
+    });
+    return output;
+  }
+
+  async function resolveConfig() {
+    try {
+      const response = await fetch("/api/config", { cache: "no-store" });
+      if (!response.ok) return fallbackConfig;
+      const data = await response.json();
+      return data?.config ? merge(fallbackConfig, data.config) : fallbackConfig;
+    } catch {
+      return fallbackConfig;
+    }
+  }
+
   function setTheme() {
     const t = config.theme || {};
     Object.entries(t).forEach(([key, value]) => {
@@ -26,14 +59,17 @@
   }
 
   function setMetadata() {
-    document.title = config.site.title || document.title;
+    const site = config.site || {};
+    document.title = site.title || document.title;
     const description = document.querySelector('meta[name="description"]');
-    if (description && config.site.description) description.content = config.site.description;
-    $("#brandLine1").textContent = config.site.brandLine1 || "";
-    $("#brandLine2").textContent = config.site.brandLine2 || "";
-    $("#brandSubtitle").textContent = config.site.brandSubtitle || "";
-    $("#copyright").textContent = config.site.copyright || "";
-    $("#footerNote").textContent = config.site.footerNote || "";
+    if (description && site.description) description.content = site.description;
+    $("#brandLine1").textContent = site.brandLine1 || "";
+    $("#brandLine2").textContent = site.brandLine2 || "";
+    $("#brandSubtitle").textContent = site.brandSubtitle || "";
+    $("#copyright").textContent = site.copyright || "";
+    $("#footerNote").textContent = site.footerNote || "";
+    const mark = $(".brand-mark");
+    if (mark) mark.src = site.brandMark || "/assets/catarina-mark.svg";
   }
 
   function renderCarousel() {
@@ -48,12 +84,12 @@
 
     slidesRoot.innerHTML = slides.map((slide, index) => `
       <article class="slide${index === 0 ? " active" : ""}" data-slide="${index}" aria-hidden="${index === 0 ? "false" : "true"}">
-        <img src="${slide.image || ""}" alt="" loading="${index === 0 ? "eager" : "lazy"}" style="object-position:${slide.imagePosition || "center"}" />
+        <img src="${escapeHtml(slide.image || "")}" alt="" loading="${index === 0 ? "eager" : "lazy"}" style="object-position:${escapeHtml(slide.imagePosition || "center")}" />
         <div class="slide-overlay"></div>
         <div class="slide-copy">
-          <span>${slide.eyebrow || ""}</span>
-          <h1>${slide.title || ""}</h1>
-          <p>${slide.subtitle || ""}</p>
+          <span>${escapeHtml(slide.eyebrow || "")}</span>
+          <h1>${escapeHtml(slide.title || "")}</h1>
+          <p>${escapeHtml(slide.subtitle || "")}</p>
         </div>
       </article>
     `).join("");
@@ -137,6 +173,7 @@
       el.hidden = true;
       return;
     }
+    el.hidden = false;
     el.href = item.url;
     $("#featuredTitle").textContent = item.title || "";
     $("#featuredSubtitle").textContent = item.subtitle || "";
@@ -147,12 +184,12 @@
     const list = $("#linksList");
     const items = (config.links || []).filter((item) => item.visible !== false && item.url);
     list.innerHTML = items.map((item) => `
-      <a class="link-card" href="${item.url}" target="_blank" rel="noopener noreferrer">
+      <a class="link-card" href="${escapeHtml(item.url)}" target="_blank" rel="noopener noreferrer">
         <span class="link-accent" aria-hidden="true"></span>
         <span class="link-icon" aria-hidden="true">${icons[item.icon] || icons.globe}</span>
         <span class="link-copy">
-          <strong>${item.label || ""}</strong>
-          ${item.detail ? `<small>${item.detail}</small>` : ""}
+          <strong>${escapeHtml(item.label || "")}</strong>
+          ${item.detail ? `<small>${escapeHtml(item.detail)}</small>` : ""}
         </span>
         <span class="link-arrow" aria-hidden="true">→</span>
       </a>
@@ -166,8 +203,9 @@
       card.hidden = true;
       return;
     }
+    card.hidden = false;
     $("#bioQuote").textContent = bio.quote || "";
-    $("#bioLocation").textContent = bio.location || config.site.location || "";
+    $("#bioLocation").textContent = bio.location || config.site?.location || "";
   }
 
   function renderServices() {
@@ -177,15 +215,21 @@
       section.hidden = true;
       return;
     }
-    $("#servicesList").innerHTML = services.items.map((item) => `<span>${item.label || ""}</span>`).join("");
+    section.hidden = false;
+    $("#servicesList").innerHTML = services.items.map((item) => `<span>${escapeHtml(item.label || "")}</span>`).join("");
   }
 
-  setTheme();
-  setMetadata();
-  const carouselElements = renderCarousel();
-  renderFeatured();
-  renderLinks();
-  renderBio();
-  renderServices();
-  setupCarousel(carouselElements);
+  async function init() {
+    config = await resolveConfig();
+    setTheme();
+    setMetadata();
+    const carouselElements = renderCarousel();
+    renderFeatured();
+    renderLinks();
+    renderBio();
+    renderServices();
+    setupCarousel(carouselElements);
+  }
+
+  init();
 })();
