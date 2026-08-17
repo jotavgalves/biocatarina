@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#fffaf6" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Admin | Catarina Queiroz Bio</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin/admin.css" />
+</head>
+<body>
+  <main class="login-shell" id="loginView">
+    <form class="login-card" id="loginForm">
+      <img src="/favicon.svg" class="login-logo" alt="" />
+      <p class="eyebrow">CATARINA QUEIROZ</p>
+      <h1>Administrar bio</h1>
+      <p class="muted">Edite o conteúdo publicado em bio.catarinaqueiroz.com.br.</p>
+      <label class="field">
+        <span>Senha</span>
+        <input id="passwordInput" type="password" autocomplete="current-password" required autofocus />
+      </label>
+      <button class="button primary wide" type="submit" id="loginButton">Entrar</button>
+      <p class="form-message" id="loginMessage" aria-live="polite"></p>
+    </form>
+  </main>
+
+  <div class="app" id="adminView" hidden>
+    <header class="topbar">
+      <div class="topbar-brand">
+        <img src="/favicon.svg" alt="" />
+        <div><strong>Bio Catarina</strong><span>Painel administrativo</span></div>
+      </div>
+      <div class="topbar-actions">
+        <a class="button ghost" href="/" target="_blank" rel="noopener">Ver bio</a>
+        <button class="button ghost" type="button" id="logoutButton">Sair</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="side-nav">
+        <a href="#identidade">Identidade</a>
+        <a href="#cores">Cores</a>
+        <a href="#destaque">Botão principal</a>
+        <a href="#carrossel">Carrossel</a>
+        <a href="#links">Links</a>
+        <a href="#bio">Apresentação</a>
+        <a href="#servicos">Procedimentos</a>
+      </aside>
+
+      <main class="editor">
+        <section class="intro">
+          <div>
+            <p class="eyebrow">CONTEÚDO DA BIO</p>
+            <h1>Editar página</h1>
+            <p>As alterações são salvas no Cloudflare KV e entram na bio sem novo commit ou deploy.</p>
+          </div>
+          <div class="source-pill" id="sourcePill">Carregando…</div>
+        </section>
+
+        <section class="panel" id="identidade">
+          <div class="panel-heading"><div><p class="eyebrow">IDENTIDADE</p><h2>Marca e metadados</h2></div></div>
+          <div class="form-grid two">
+            <label class="field span-2"><span>Título da página</span><input data-path="site.title" /></label>
+            <label class="field span-2"><span>Descrição</span><textarea data-path="site.description" rows="2"></textarea></label>
+            <label class="field"><span>Logo — linha 1</span><input data-path="site.brandLine1" /></label>
+            <label class="field"><span>Logo — linha 2</span><input data-path="site.brandLine2" /></label>
+            <label class="field"><span>Subtítulo da marca</span><input data-path="site.brandSubtitle" /></label>
+            <label class="field"><span>Localização curta</span><input data-path="site.location" /></label>
+            <label class="field span-2"><span>URL/arquivo do símbolo da marca</span><input data-path="site.brandMark" placeholder="/assets/catarina-mark.svg" /></label>
+            <label class="field span-2"><span>Copyright</span><input data-path="site.copyright" /></label>
+            <label class="field span-2"><span>Texto do rodapé</span><input data-path="site.footerNote" /></label>
+          </div>
+        </section>
+
+        <section class="panel" id="cores">
+          <div class="panel-heading"><div><p class="eyebrow">APARÊNCIA</p><h2>Cores</h2></div></div>
+          <div class="color-grid" id="themeFields"></div>
+        </section>
+
+        <section class="panel" id="destaque">
+          <div class="panel-heading">
+            <div><p class="eyebrow">CTA PRINCIPAL</p><h2>Botão de agendamento</h2></div>
+            <label class="switch"><input type="checkbox" data-path="featured.visible" data-type="boolean" /><span></span>Ativo</label>
+          </div>
+          <div class="form-grid two">
+            <label class="field"><span>Ícone</span><select data-path="featured.icon"><option value="calendar">Calendário</option><option value="whatsapp">WhatsApp</option><option value="globe">Site</option><option value="map">Localização</option><option value="instagram">Instagram</option></select></label>
+            <label class="field"><span>Título</span><input data-path="featured.title" /></label>
+            <label class="field span-2"><span>Subtítulo</span><input data-path="featured.subtitle" /></label>
+            <label class="field span-2"><span>Link</span><input data-path="featured.url" type="url" /></label>
+          </div>
+        </section>
+
+        <section class="panel" id="carrossel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">DESTAQUES</p><h2>Carrossel</h2></div>
+            <button class="button small" type="button" id="addSlide">+ Adicionar slide</button>
+          </div>
+          <div class="form-grid two compact-settings">
+            <label class="switch"><input type="checkbox" data-path="carousel.autoplay" data-type="boolean" /><span></span>Autoplay</label>
+            <label class="field"><span>Intervalo em ms</span><input type="number" min="2500" step="100" data-path="carousel.intervalMs" data-type="number" /></label>
+          </div>
+          <div class="repeat-list" id="slidesEditor"></div>
+        </section>
+
+        <section class="panel" id="links">
+          <div class="panel-heading">
+            <div><p class="eyebrow">ACESSOS</p><h2>Links</h2></div>
+            <button class="button small" type="button" id="addLink">+ Adicionar link</button>
+          </div>
+          <div class="repeat-list" id="linksEditor"></div>
+        </section>
+
+        <section class="panel" id="bio">
+          <div class="panel-heading">
+            <div><p class="eyebrow">APRESENTAÇÃO</p><h2>Texto institucional</h2></div>
+            <label class="switch"><input type="checkbox" data-path="bio.visible" data-type="boolean" /><span></span>Ativo</label>
+          </div>
+          <div class="form-grid">
+            <label class="field"><span>Texto</span><textarea data-path="bio.quote" rows="4"></textarea></label>
+            <label class="field"><span>Localização</span><input data-path="bio.location" /></label>
+          </div>
+        </section>
+
+        <section class="panel" id="servicos">
+          <div class="panel-heading">
+            <div><p class="eyebrow">CUIDADOS EM DESTAQUE</p><h2>Procedimentos</h2></div>
+            <label class="switch"><input type="checkbox" data-path="services.visible" data-type="boolean" /><span></span>Ativo</label>
+          </div>
+          <div class="services-editor" id="servicesEditor"></div>
+          <button class="button small" type="button" id="addService">+ Adicionar procedimento</button>
+        </section>
+
+        <section class="danger-panel">
+          <div><strong>Restaurar padrão do código</strong><p>Apaga apenas a configuração do KV. A bio volta a usar o conteúdo padrão do repositório.</p></div>
+          <button class="button danger" type="button" id="resetButton">Restaurar</button>
+        </section>
+      </main>
+    </div>
+
+    <div class="savebar">
+      <div><span class="save-dot" id="saveDot"></span><span id="saveStatus">Sem alterações</span></div>
+      <button class="button primary" type="button" id="saveButton">Salvar alterações</button>
+    </div>
+  </div>
+
+  <script src="/content.js"></script>
+  <script src="/admin/admin.js"></script>
+</body>
+</html>
