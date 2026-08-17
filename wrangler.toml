@@ -1,0 +1,7 @@
+﻿name = "catarinaqueiroz"
+pages_build_output_dir = "."
+compatibility_date = "2026-08-14"
+
+[[kv_namespaces]]
+binding = "BIO_CONFIG"
+id = "246bfaa69f8e48e0a60245f2ab818430"
