@@ -1,7 +1,7 @@
 /*
- * TODO EDITÁVEL
- * Altere textos, links, imagens e cores somente neste arquivo.
- * O app esconde automaticamente links com url vazia e itens com visible: false.
+ * CONFIGURAÇÃO PADRÃO / FALLBACK
+ * O painel /admin salva uma cópia editável no Cloudflare KV.
+ * Se o KV estiver vazio ou indisponível, a bio usa estes valores.
  */
 window.BIO_CONFIG = {
   site: {
@@ -10,6 +10,7 @@ window.BIO_CONFIG = {
     brandLine1: "CATARINA",
     brandLine2: "QUEIROZ",
     brandSubtitle: "CLÍNICA ESTÉTICA",
+    brandMark: "/assets/catarina-mark.svg",
     location: "Boa Viagem • Recife",
     copyright: "© 2026 Catarina Queiroz Clínica Estética.",
     footerNote: "Estética facial e corporal com atendimento personalizado."
